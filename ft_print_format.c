@@ -60,15 +60,19 @@
 	}
 }*/
 
-void	ft_print_hex(int nbr)
+int	ft_print_hex(int nbr)
 {
+	int	il;
+
+	il = 1;
 	if (nbr == 0)
-		return ;
-	ft_print_hex(nbr / 16);
+		return (0);
+	il += ft_print_hex(nbr / 16);
 	if(nbr % 16 > 9)
 		ft_putchar_fd((nbr % 16 - 10) + 'a', 1);
 	else
 		ft_putchar_fd((nbr % 16) + '0', 1);
+	return (il);
 }
 
 void	ft_print_int(t_print *tab)
@@ -84,7 +88,15 @@ void	ft_print_int(t_print *tab)
 	{
 		if(tab->dash == 1)
 		{
-			ft_putchar_fd(ft_itoa(val), 1);
+			if (tab->sign == 1)
+			{
+				if (val >= 0)
+				{
+					ft_putchar_fd('+', 1);
+					i++;
+				}
+			}
+			ft_putstr_fd(ft_itoa(val), 1);
 			while (tab->wdt < i + len)
 			{
 				ft_putstr_fd(' ', 1);
@@ -95,12 +107,30 @@ void	ft_print_int(t_print *tab)
 		{
 			if (tab->zero == 1)
 			{
-				while (tab->wdt < i + len)
+				if (tab->sign == 1)
 				{
-					ft_putchar_fd('0', 1);
-					i++;
+					if (val >= 0)
+					{
+						ft_putchar_fd('+', 1);
+						i++;
+					}
+					while (tab->wdt < i + len)
+					{
+						ft_putchar_fd('0', 1);
+						i++;
+					}
+					ft_putstr_fd(ft_itoa(val), 1);
 				}
-				ft_putstr_fd(ft_itoa(val), 1);
+				else
+				{
+					while (tab->wdt < i + len)
+					{
+						ft_putchar_fd('0', 1);
+						i++;
+					}
+					ft_putstr_fd(ft_itoa(val), 1);
+				}
+				
 			}
 			else
 			{
@@ -159,5 +189,3 @@ void	ft_print_spaces()
 {
 	
 }
-
-
