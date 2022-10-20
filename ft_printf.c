@@ -84,6 +84,11 @@ int ft_format(t_print *tab, char *format, int pos)
 			tab->sign = 1;
 			pos++;
 		}
+		else if (format[pos] == '#')
+		{
+			tab->hastag = 1;
+			pos++;
+		}
 		else if (ft_isdigit(format[pos]) && format[pos] != 0)
 		{
 			pos = ft_strtonum(pos, format, tab);
@@ -96,7 +101,7 @@ int ft_format(t_print *tab, char *format, int pos)
 	}
 	//printf("\ni = %d\n", pos);
 	//ft_print_tab(tab);
-	ft_print_char(tab);
+	ft_print_int(tab);
 	return (pos + 1);
 }
 
@@ -134,5 +139,5 @@ int		ft_printf(const char *format, ...)
 
 int main()
 {
-	ft_printf("ciap%10cdfre%ct", 'w', 'c');
+	ft_printf("#%10d#", 55);
 }
