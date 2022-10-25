@@ -1,6 +1,6 @@
-CC=gcc
-
 CFLAGS=-Wall -Wextra -Werror -I.
+
+CC=gcc
 
 NAME=libft.a
 

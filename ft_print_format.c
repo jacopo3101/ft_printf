@@ -1,6 +1,20 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ft_print_format.c                                  :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: javellis <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/10/24 16:39:24 by javellis          #+#    #+#             */
+/*   Updated: 2022/10/24 16:39:28 by javellis         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include"ft_printf.h"
 #include"libft/libft.h"
-int ft_print_format(t_print tab, char *format, int pos)
+#include <stdlib.h>
+
+int	ft_print_format(t_print *tab, char *format, int pos)
 {
 	int	i;
 
@@ -8,145 +22,76 @@ int ft_print_format(t_print tab, char *format, int pos)
 	if (format[pos] == 'c')
 	{
 		ft_putchar_fd(va_arg(tab->args, int), 1);
-		i++;	
+		i++;
 	}
 	else if (format[pos] == 's')
-		i +=ft_print_str(tab); 
+		i += ft_print_str(tab);
 	else if (format[pos] == 'p')
 		i += ft_print_ptr(tab);
 	else if (format[pos] == 'd' || format[pos] == 'i')
 		i += ft_print_int(tab);
 	else if (format[pos] == 'u')
-		i += ft_print_unint(tab);		
+		i += ft_print_unint(tab);
 	else if (format[pos] == 'x')
 		i += ft_hex_format(tab, 0);
 	else if (format[pos] == 'X')
 		i += ft_hex_format(tab, 32);
-	else
-	{
-		//return (-1);
-		// caso non valido
-	}
+	else if (format[pos] == '%')
+		i += write(1, "%", 1);
+	return (i);
 }
 
 int	ft_print_str(t_print *tab)
 {
-	char *str;
+	char	*str;
+	int		len;
 
 	str = va_arg(tab->args, char *);
+	if (str == 0)
+		return (write(1, "(null)", 6));
+	len = ft_strlen(str);
 	ft_putstr_fd(str, 1);
-	return (ft_strlen(str));
-}
-
-int	ft_print_hex(int nbr, int offset)
-{
-	int	il;
-
-	il = 1;
-	if (nbr == 0)
-		return (0);
-	il += ft_print_hex(nbr / 16, offset);
-	if(nbr % 16 > 9)
-		ft_putchar_fd((nbr % 16 - 10) + ('a' - offset), 1);
-	else
-		ft_putchar_fd((nbr % 16) + '0', 1);
-	return (il);
-}
-
-int	ft_hex_format(t_print *tab, int up_flag)
-{
-	int	val;
-	int	i;
-
-	i = 0;
-	val = va_arg(tab->args, int);
-	if (tab->hastag && up_flag && val != 0)
-	{
-		ft_putstr_fd("0X", 1);
-		i += 2;
-	}
-	else if (tab->hastag && !up_flag && val != 0)
-	{
-		ft_putstr_fd("0x", 1);
-		i += 2;
-	}
-	i += ft_print_hex(val, up_flag);
-	return i;
-	
-}
-
-int	ft_print_hexptr(unsigned long long nbr)
-{
-	int	i;
-
-	i = 1;
-	if (nbr == 0)
-		return (0);
-	il += ft_print_hex(nbr / 16, offset);
-	if(nbr % 16 > 9)
-		ft_putchar_fd((nbr % 16 - 10) + 'a', 1);
-	else
-		ft_putchar_fd((nbr % 16) + '0', 1);
-	return (i);
-}
-
-int	ft_print_ptr(t_print *tab)
-{
-	int	i;
-	unsigned long long val;
-
-	val = va_arg(tab->args, unsigned long long);
-	ft_putstr_fd("0x", 1);
-	i += 2;
-	if (val == 0)
-	{
-		ft_purchar_fd('0', 1);
-		i++;
-	}
-	else
-		i += ft_print_hexptr(val);
-	return (i);
+	return (len);
 }
 
 int	ft_print_unint(t_print *tab)
 {
 	unsigned int	val;
-	int	i;
-	
+	char			*nbr;
+
 	val = va_arg(tab->args, unsigned int);
-	ft_putstr_fd(ft_itoa(val), 1);
-	return (ft_strlen(ft_itoa(val)));
+	nbr = ft_unsigned_itoa(val);
+	ft_putstr_fd(nbr, 1);
+	val = ft_strlen(nbr);
+	free(nbr);
+	return ((int)val);
 }
 
 int	ft_print_int(t_print *tab)
 {
-	int	i;
-	int	val;
-	int	len;
+	int		i;
+	int		val;
+	int		len;
+	char	*nbr;
 
 	i = 0;
 	val = va_arg(tab->args, int);
-	len = ft_strlen(ft_itoa(val));
+	nbr = ft_itoa(val);
+	len = ft_strlen(nbr);
 	if (tab->sign)
 	{
-		if (val > 0)
+		if (val >= 0)
 		{
 			ft_putchar_fd('+', 1);
 			i++;
 		}
 	}
-	else if (tab->sp)
+	else if (tab->sp && val >= 0)
 	{
 		ft_putchar_fd(' ', 1);
 		i++;
 	}
-	ft_putstr_fd(ft_itoa(val), 1);
+	ft_putstr_fd(nbr, 1);
+	free(nbr);
 	return (i + len);
 }
-/*
-void ft_print_char(t_print *tab)
-{
-	char	c;
-	c = (char)va_arg(tab->args, int);
-	ft_putchar_fd(va_arg(tab->args, int), 1);
-}*/
